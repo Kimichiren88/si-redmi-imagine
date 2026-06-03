@@ -192,7 +192,10 @@ function generateImage() {
   };
 
   const hash = encodeURIComponent(JSON.stringify(hashData));
-  const embedUrl = 'https://image-generation.perchance.org/embed#' + hash;
+  
+  // Use Pollinations.ai free web generator (no API key, works in browser)
+  const pollinationsPrompt = encodeURIComponent(prompt);
+  const embedUrl = `https://pollinations.ai/p/${pollinationsPrompt}?width=${resolution.split('x')[0]}&height=${resolution.split('x')[1]}&model=flux&nologo=true`;
   
   // Open in new tab
   const newTab = window.open(embedUrl, '_blank');
