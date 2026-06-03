@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Si Redmi Imagine — Free AI Image Generator</title>
+<meta name="description" content="Free AI Image Generator. No sign-up, unlimited. Powered by Flux Schnell.">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg2: #12121a;
+  --bg3: #1a1a26;
+  --text: #e8e8f0;
+  --text2: #a0a0b8;
+  --accent: #d4a574;
+  --accent2: #e6c69a;
+  --border: rgba(255,255,255,0.06);
+  --red: #c4607e;
+  --radius: 12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;-webkit-font-smoothing:antialiased}
+header{width:100%;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
+.logo{font-weight:800;font-size:1.3rem;letter-spacing:-0.02em}
+.logo span{color:var(--accent)}
+.badge{font-size:0.7rem;background:var(--accent);color:var(--bg);padding:4px 10px;border-radius:99px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
+main{width:100%;max-width:900px;padding:28px 20px 60px;display:flex;flex-direction:column;gap:24px}
+.input-group{display:flex;flex-direction:column;gap:8px}
+label{font-size:0.8rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em}
+textarea,input[type=text],select{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:var(--radius);font-size:0.95rem;font-family:inherit;resize:none;transition:border 0.2s}
+textarea:focus,input:focus,select:focus{outline:none;border-color:var(--accent)}
+textarea{min-height:80px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+.btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);border:none;padding:14px 32px;border-radius:var(--radius);font-weight:700;font-size:1rem;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;letter-spacing:-0.01em}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(212,165,116,0.3)}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.result{position:relative;border-radius:var(--radius);overflow:hidden;background:var(--bg3);border:1px solid var(--border);min-height:300px;display:flex;align-items:center;justify-content:center}
+.result img{width:100%;height:auto;display:block}
+.result .placeholder{color:var(--text2);font-size:0.95rem;text-align:center;padding:40px}
+.result .loading{display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--text2)}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.presets-row{display:flex;gap:8px;flex-wrap:wrap}
+.preset{font-size:0.75rem;padding:6px 14px;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.preset:hover,.preset.active{border-color:var(--accent);color:var(--accent);background:rgba(212,165,116,0.08)}
+.tip{font-size:0.78rem;color:var(--text2);text-align:center}
+.hidden{display:none!important}
+iframe{border:none;width:100%;height:500px}
+.gallery-frame{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <div class="logo">🎨 <span>Si Redmi</span> Imagine</div>
+  <div class="badge">Free • No Sign-Up</div>
+</header>
+
+<main>
+  <!-- INPUT SECTION -->
+  <div class="input-group">
+    <label>Prompt</label>
+    <textarea id="prompt" placeholder="Describe your image... contoh: a majestic dragon flying over a cyberpunk city at sunset, golden lighting, highly detailed"></textarea>
+  </div>
+
+  <!-- STYLE PRESETS -->
+  <div>
+    <label style="margin-bottom:8px;display:block">Style Presets</label>
+    <div class="presets-row" id="stylePresets">
+      <button class="preset active" data-prefix="">None</button>
+      <button class="preset" data-prefix="anime style, ">Anime</button>
+      <button class="preset" data-prefix="photorealistic, 8k, ">Realistic</button>
+      <button class="preset" data-prefix="oil painting, masterpiece, ">Oil Painting</button>
+      <button class="preset" data-prefix="cinematic, film grain, ">Cinematic</button>
+      <button class="preset" data-prefix="pixel art, 16-bit, ">Pixel Art</button>
+      <button class="preset" data-prefix="cyberpunk, neon, ">Cyberpunk</button>
+      <button class="preset" data-prefix="watercolor, pastel, ">Watercolor</button>
+      <button class="preset" data-prefix="3D render, octane, ">3D Render</button>
+      <button class="preset" data-prefix="sketch, pencil drawing, ">Sketch</button>
+    </div>
+  </div>
+
+  <!-- SETTINGS ROW -->
+  <div class="row">
+    <div class="input-group">
+      <label>Resolution</label>
+      <select id="resolution">
+        <option value="768x768">Square (768×768)</option>
+        <option value="512x768">Portrait (512×768)</option>
+        <option value="768x512">Landscape (768×512)</option>
+        <option value="512x512">Small (512×512)</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>Guidance Scale (1-20)</label>
+      <input type="number" id="guidance" value="7" min="1" max="20" step="0.5">
+    </div>
+  </div>
+
+  <div class="input-group">
+    <label>Negative Prompt (optional)</label>
+    <input type="text" id="negative" placeholder="Things to avoid... e.g. blurry, low quality, watermark">
+  </div>
+
+  <!-- GENERATE BUTTON -->
+  <button class="btn" id="generateBtn" onclick="generateImage()">✨ Generate Image</button>
+
+  <!-- RESULT -->
+  <div class="result" id="resultContainer">
+    <div class="placeholder" id="placeholder">Your generated image will appear here 🎨</div>
+    <div class="loading hidden" id="loading">
+      <div class="spinner"></div>
+      <span>Opening Perchance embed in new tab...</span>
+    </div>
+  </div>
+
+  <div id="embedLink" class="hidden" style="text-align:center;padding:16px">
+    <p style="color:var(--text2);margin-bottom:12px">Image generated! If new tab didn't open:</p>
+    <a id="embedUrl" href="#" target="_blank" class="btn" style="display:inline-block;text-decoration:none">🔗 Open Image</a>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions hidden" id="actionsRow">
+    <button class="btn btn-secondary" onclick="downloadImage()">⬇ Download</button>
+    <button class="btn btn-secondary" onclick="generateImage()">🔄 Regenerate</button>
+  </div>
+
+  <!-- GALLERY -->
+  <div style="margin-top:16px">
+    <label style="margin-bottom:8px;display:block">Public Gallery</label>
+    <div class="gallery-frame">
+      <iframe id="galleryIframe" src="https://image-generation.perchance.org/gallery?channel=si-redmi-imagine&sort=recent&contentFilter=pg13" style="width:100%;height:600px;border:none" allow="clipboard-write"></iframe>
+    </div>
+  </div>
+
+  <p class="tip">Powered by <strong>Flux Schnell</strong> via Perchance. Free, no API key, unlimited generations.</p>
+</main>
+
+<script>
+let currentPreset = '';
+
+// Style presets
+document.querySelectorAll('#stylePresets .preset').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('#stylePresets .preset').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    currentPreset = this.dataset.prefix;
+  });
+});
+
+function generateImage() {
+  const promptEl = document.getElementById('prompt');
+  const prompt = currentPreset + promptEl.value.trim();
+  
+  if (!promptEl.value.trim()) {
+    alert('Sila isi prompt dulu bos!');
+    return;
+  }
+
+  const resolution = document.getElementById('resolution').value;
+  const guidance = parseFloat(document.getElementById('guidance').value) || 7;
+  const negative = document.getElementById('negative').value || 
+    'worst quality, low quality, blurry, watermark, text, ugly, deformed';
+
+  // Show loading
+  document.getElementById('placeholder').classList.add('hidden');
+  document.getElementById('loading').classList.remove('hidden');
+  document.getElementById('embedLink').classList.add('hidden');
+  document.getElementById('actionsRow').classList.add('hidden');
+  document.getElementById('generateBtn').disabled = true;
+
+  const requestId = 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+  
+  const hashData = {
+    prompt: prompt,
+    resolution: resolution,
+    guidanceScale: guidance,
+    negativePrompt: negative,
+    seed: '-1',
+    requestId: requestId,
+    forceColorScheme: 'dark',
+    verifyOnly: false,
+    saveTitle: 'Si Redmi Imagine',
+    saveDescription: 'Generated: ' + new Date().toLocaleString(),
+    saveChannel: 'si-redmi-imagine'
+  };
+
+  const hash = encodeURIComponent(JSON.stringify(hashData));
+  const embedUrl = 'https://image-generation.perchance.org/embed#' + hash;
+  
+  // Open in new tab
+  const newTab = window.open(embedUrl, '_blank');
+  
+  // Show fallback link
+  document.getElementById('embedUrl').href = embedUrl;
+  
+  setTimeout(() => {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('embedLink').classList.remove('hidden');
+    document.getElementById('actionsRow').classList.remove('hidden');
+    document.getElementById('generateBtn').disabled = false;
+  }, 1500);
+}
+
+function downloadImage() {
+  const embedUrl = document.getElementById('embedUrl').href;
+  if (embedUrl && embedUrl !== '#') {
+    window.open(embedUrl, '_blank');
+  }
+}
+
+// Keyboard shortcut: Ctrl+Enter to generate
+document.getElementById('prompt').addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    generateImage();
+  }
+});
+</script>
+
+</body>
+</html>
